@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import gsap from "gsap";
 import { marquee } from "@/content";
 import { scrollState } from "@/lib/scrollState";
 import { useReducedMotion } from "@/lib/useReducedMotion";
@@ -40,7 +39,11 @@ export function Marquee() {
     if (!el || reduced) return;
     let x = 0;
     let dir = -1;
-    const tick = (_t: number, dtMs: number) => {
+    let last = performance.now();
+    let raf = 0;
+    const tick = (now: number) => {
+      const dtMs = Math.min(now - last, 64);
+      last = now;
       const loop = el.scrollWidth / COPIES;
       const v = scrollState.velocity;
       if (Math.abs(v) > 0.6) dir += ((v > 0 ? -1 : 1) - dir) * 0.08;
@@ -50,9 +53,10 @@ export function Marquee() {
       if (x <= -loop) x += loop;
       if (x > 0) x -= loop;
       el.style.transform = `translate3d(${x}px,0,0)`;
+      raf = requestAnimationFrame(tick);
     };
-    gsap.ticker.add(tick);
-    return () => gsap.ticker.remove(tick);
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
   }, [reduced]);
 
   return (

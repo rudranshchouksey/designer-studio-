@@ -6,7 +6,6 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { scrollState } from "@/lib/scrollState";
 import { prefersReducedMotion } from "@/lib/useReducedMotion";
-import { onReady } from "@/lib/ready";
 
 /** Lenis smooth scroll wired into the GSAP ticker; also tracks velocity + pointer. */
 export function SmoothScroll() {
@@ -19,9 +18,7 @@ export function SmoothScroll() {
       lenis = new Lenis({ lerp: 0.1, smoothWheel: true });
       scrollState.lenis = lenis;
       lenis.on("scroll", ScrollTrigger.update);
-      lenis.stop();
     }
-    const offReady = onReady(() => lenis?.start());
 
     let lastY = window.scrollY;
     const tick = (time: number) => {
@@ -41,7 +38,6 @@ export function SmoothScroll() {
     window.addEventListener("pointermove", onMove, { passive: true });
 
     return () => {
-      offReady();
       gsap.ticker.remove(tick);
       window.removeEventListener("pointermove", onMove);
       lenis?.destroy();

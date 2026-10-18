@@ -4,7 +4,6 @@ import { useEffect } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { prefersReducedMotion } from "@/lib/useReducedMotion";
-import { onReady } from "@/lib/ready";
 
 /**
  * Global scroll-reveal wiring, driven by data attributes:
@@ -16,10 +15,8 @@ export function Reveals() {
   useEffect(() => {
     if (prefersReducedMotion()) return;
     gsap.registerPlugin(ScrollTrigger);
-    let stop = () => {};
-
     const ctx = gsap.context(() => {
-      const heads = gsap.utils.toArray<HTMLElement>("[data-lines]");
+      const heads = gsap.utils.toArray<HTMLElement>("[data-lines]:not([data-eager])");
       const fades = gsap.utils.toArray<HTMLElement>("[data-fade]");
       const groups = gsap.utils.toArray<HTMLElement>("[data-stagger]");
 
@@ -29,7 +26,6 @@ export function Reveals() {
         gsap.set(g.querySelectorAll("[data-stagger-item]"), { autoAlpha: 0, y: 36 }),
       );
 
-      stop = onReady(() => {
         heads.forEach((h) =>
           gsap.to(h.querySelectorAll("[data-line]"), {
             yPercent: 0,
@@ -60,13 +56,9 @@ export function Reveals() {
           }),
         );
         ScrollTrigger.refresh();
-      });
     });
 
-    return () => {
-      stop();
-      ctx.revert();
-    };
+    return () => ctx.revert();
   }, []);
 
   return null;

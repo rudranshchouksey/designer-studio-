@@ -2,15 +2,13 @@ import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Instrument_Serif, JetBrains_Mono } from "next/font/google";
 import { site } from "@/content";
 import { Grain } from "@/components/layout/Grain";
-import { Cursor } from "@/components/layout/Cursor";
+import { Enhancements } from "@/components/layout/Enhancements";
 import { Preloader } from "@/components/layout/Preloader";
-import { SmoothScroll } from "@/components/layout/SmoothScroll";
-import { Reveals } from "@/components/layout/Reveals";
 import "./globals.css";
 
 const display = Bricolage_Grotesque({
   subsets: ["latin"],
-  axes: ["wdth", "opsz"],
+  axes: ["wdth"],
   variable: "--font-bricolage",
   display: "swap",
 });
@@ -55,8 +53,8 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-// Runs before paint: decides whether motion is on so the preloader never flashes for reduced-motion users.
-const motionScript = `(function(){var d=document.documentElement;var r=matchMedia('(prefers-reduced-motion: reduce)').matches;d.dataset.motion=r?'off':'on';if(r)d.dataset.ready='1';})();`;
+// Runs before paint: decides whether motion is on and whether the (first-visit-only) preloader should show at all.
+const motionScript = `(function(){var d=document.documentElement;var r=matchMedia('(prefers-reduced-motion: reduce)').matches;var s=false;try{s=sessionStorage.getItem('twinpix-seen')==='1'}catch(e){}d.dataset.motion=r?'off':'on';if(r||s){d.dataset.ready='1';d.dataset.preload='skip'}})();`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -73,9 +71,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Skip to content
         </a>
         <Preloader />
-        <SmoothScroll />
-        <Reveals />
-        <Cursor />
+        <Enhancements />
         <Grain />
         {children}
       </body>

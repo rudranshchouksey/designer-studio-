@@ -5,16 +5,18 @@ type Props = {
   as?: ElementType;
   className?: string;
   id?: string;
+  /** Render visible from first paint (CSS rise only) — use for the LCP headline. */
+  eager?: boolean;
 };
 
 /**
  * Renders a content.ts headline. "\n" = new line, *asterisks* = serif italic accent.
  * Each line is masked so GSAP (Reveals) can slide it up.
  */
-export function Headline({ text, as: Tag = "h2", className = "", id }: Props) {
+export function Headline({ text, as: Tag = "h2", className = "", id, eager }: Props) {
   const lines = text.split("\n");
   return (
-    <Tag id={id} className={`display ${className}`} data-lines>
+    <Tag id={id} className={`display ${className}`} data-lines data-eager={eager ? "" : undefined}>
       {lines.map((line, i) => (
         <span className="line-mask" key={i}>
           <span className="line-inner" data-line>

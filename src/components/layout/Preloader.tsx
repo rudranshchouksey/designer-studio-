@@ -1,66 +1,73 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import gsap from "gsap";
 import { LogoMark } from "@/components/ui/Logo";
 import { prefersReducedMotion } from "@/lib/useReducedMotion";
 import { markReady } from "@/lib/ready";
 
+const DURATION = 750;
+const easeInOut = (t: number) => (t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2);
+
+/**
+ * Non-blocking first-visit indicator (corner, never covers content). Skipped entirely for
+ * reduced-motion users and repeat visits in the same session — the inline script in layout.tsx
+ * decides that before paint, so nothing flashes. Plain rAF: no animation library on the critical path.
+ */
 export function Preloader() {
   const root = useRef<HTMLDivElement>(null);
   const count = useRef<HTMLSpanElement>(null);
-  const mark = useRef<HTMLDivElement>(null);
+  const bar = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     const el = root.current;
     if (!el) return;
-    if (prefersReducedMotion()) {
+    const skip = document.documentElement.dataset.preload === "skip" || prefersReducedMotion();
+    try {
+      sessionStorage.setItem("twinpix-seen", "1");
+    } catch {}
+    if (skip) {
       el.style.display = "none";
       markReady();
       return;
     }
-    const counter = { v: 0 };
-    const tl = gsap.timeline();
-    tl.fromTo(
-      mark.current,
-      { scale: 0.6, opacity: 0 },
-      { scale: 1, opacity: 1, duration: 0.45, ease: "power3.out" },
-      0,
-    )
-      .to(
-        counter,
-        {
-          v: 100,
-          duration: 1.05,
-          ease: "power2.inOut",
-          onUpdate: () => {
-            if (count.current) count.current.textContent = String(Math.round(counter.v)).padStart(3, "0");
-          },
-        },
-        0,
-      )
-      .add(markReady, 1.05)
-      .to(el, { clipPath: "inset(0 0 100% 0)", duration: 0.55, ease: "power4.inOut" }, 1.05)
-      .set(el, { display: "none" });
+    el.style.opacity = "1";
+    let raf = 0;
+    let hide: ReturnType<typeof setTimeout>;
+    const t0 = performance.now();
+    const tick = (now: number) => {
+      const p = Math.min(1, (now - t0) / DURATION);
+      const v = easeInOut(p) * 100;
+      if (count.current) count.current.textContent = String(Math.round(v)).padStart(3, "0");
+      if (bar.current) bar.current.style.transform = `scaleX(${v / 100})`;
+      if (p < 1) raf = requestAnimationFrame(tick);
+      else {
+        markReady();
+        el.style.opacity = "0";
+        hide = setTimeout(() => (el.style.display = "none"), 300);
+      }
+    };
+    raf = requestAnimationFrame(tick);
     return () => {
-      tl.kill();
+      cancelAnimationFrame(raf);
+      clearTimeout(hide);
     };
   }, []);
 
   return (
     <div
       ref={root}
-      className="preloader fixed inset-0 z-[100] flex flex-col items-center justify-center bg-ink"
-      style={{ clipPath: "inset(0 0 0 0)" }}
-      role="status"
-      aria-label="Loading"
+      className="preloader pointer-events-none fixed bottom-6 right-[var(--gutter)] z-[100] flex items-center gap-4 opacity-0 transition-opacity duration-300"
+      aria-hidden="true"
     >
-      <div ref={mark}>
-        <LogoMark size={72} />
+      <LogoMark size={28} />
+      <div>
+        <p className="label tabular-nums">
+          <span ref={count}>000</span> / 100
+        </p>
+        <span className="mt-2 block h-px w-28 bg-line">
+          <span ref={bar} className="block h-full origin-left scale-x-0 bg-flame" />
+        </span>
       </div>
-      <p className="label mt-8 tabular-nums">
-        <span ref={count}>000</span> / 100
-      </p>
     </div>
   );
 }

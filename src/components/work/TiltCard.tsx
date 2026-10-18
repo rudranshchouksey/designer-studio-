@@ -1,10 +1,9 @@
 "use client";
 
 import { useRef, type ReactNode } from "react";
-import gsap from "gsap";
 import { hasFinePointer, prefersReducedMotion } from "@/lib/useReducedMotion";
 
-/** Subtle 3D tilt toward the pointer. Disabled on touch and for reduced motion. */
+/** Subtle 3D tilt toward the pointer (plain CSS transform). Disabled on touch and for reduced motion. */
 export function TiltCard({ children, className = "" }: { children: ReactNode; className?: string }) {
   const el = useRef<HTMLDivElement>(null);
 
@@ -13,18 +12,13 @@ export function TiltCard({ children, className = "" }: { children: ReactNode; cl
     const r = el.current.getBoundingClientRect();
     const px = (e.clientX - r.left) / r.width - 0.5;
     const py = (e.clientY - r.top) / r.height - 0.5;
-    gsap.to(el.current, {
-      rotateY: px * 9,
-      rotateX: -py * 9,
-      duration: 0.5,
-      ease: "power3.out",
-      transformPerspective: 900,
-      overwrite: "auto",
-    });
+    el.current.style.transition = "transform 0.12s ease-out";
+    el.current.style.transform = `perspective(900px) rotateY(${px * 9}deg) rotateX(${-py * 9}deg)`;
   };
   const leave = () => {
-    if (el.current)
-      gsap.to(el.current, { rotateX: 0, rotateY: 0, duration: 0.8, ease: "power3.out", overwrite: "auto" });
+    if (!el.current) return;
+    el.current.style.transition = "transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)";
+    el.current.style.transform = "perspective(900px) rotateX(0deg) rotateY(0deg)";
   };
 
   return (

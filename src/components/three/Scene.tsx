@@ -33,11 +33,19 @@ export function Scene() {
   useEffect(() => {
     if (!supportedGl) return;
     let t: ReturnType<typeof setTimeout>;
+    let cancel = () => {};
     const off = onReady(() => {
-      t = setTimeout(() => setArmed(true), 60);
+      const start = () => setArmed(true);
+      if ("requestIdleCallback" in window) {
+        const id = window.requestIdleCallback(start, { timeout: 1500 });
+        cancel = () => window.cancelIdleCallback(id);
+      } else {
+        t = setTimeout(start, 200);
+      }
     });
     return () => {
       off();
+      cancel();
       clearTimeout(t);
     };
   }, [supportedGl]);

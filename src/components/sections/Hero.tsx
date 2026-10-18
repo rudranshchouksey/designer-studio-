@@ -10,7 +10,7 @@ export function Hero() {
       className="relative flex min-h-[100svh] flex-col justify-end pb-8 pt-28 md:pb-10"
     >
       <div className="wrap w-full">
-        <p className="label mb-6 flex items-center gap-3" data-fade data-delay="0.1">
+        <p className="label rise mb-6 flex items-center gap-3" style={{ animationDelay: "0.1s" }}>
           <span aria-hidden="true" className="relative inline-block h-2.5 w-2.5">
             <span className="absolute left-0 top-0 h-2 w-2 bg-ultra" />
             <span className="absolute bottom-0 right-0 h-2 w-2 bg-flame mix-blend-screen" />
@@ -20,6 +20,7 @@ export function Hero() {
 
         <Headline
           as="h1"
+          eager
           id="hero-title"
           text={hero.headline}
           className="text-[clamp(3.6rem,17vw,5.5rem)] md:text-[clamp(5.5rem,12vw,11.5rem)]"
@@ -31,7 +32,7 @@ export function Hero() {
           >
             {hero.lede}
           </p>
-          <div className="flex flex-wrap gap-3 md:col-span-6 md:justify-end" data-fade data-delay="0.3">
+          <div className="rise flex flex-wrap gap-3 md:col-span-6 md:justify-end" style={{ animationDelay: "0.3s" }}>
             <Button href={hero.primary.href}>{hero.primary.label}</Button>
             <Button href={hero.secondary.href} variant="ghost">
               {hero.secondary.label}
@@ -40,9 +41,8 @@ export function Hero() {
         </div>
 
         <p
-          className="label mt-8 flex items-center gap-4 md:mt-10"
-          data-fade
-          data-delay="0.45"
+          className="label rise mt-8 flex items-center gap-4 md:mt-10"
+          style={{ animationDelay: "0.45s" }}
           aria-hidden="true"
         >
           <span className="relative block h-px w-14 overflow-hidden bg-line">

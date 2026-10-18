@@ -125,6 +125,29 @@ body {
   100% { transform: translateX(200%); }
 }
 
+/* Eager (LCP) headline: visible from first paint, only a soft rise — no masking/hiding */
+[data-eager] .line-mask {
+  overflow: visible;
+}
+[data-eager] .line-inner {
+  animation: eager-rise 1s var(--ease-out) both;
+}
+[data-eager] .line-mask:nth-child(2) .line-inner {
+  animation-delay: 0.12s;
+}
+@keyframes eager-rise {
+  from { transform: translateY(0.16em); }
+  to { transform: none; }
+}
+
+.rise {
+  animation: rise 0.9s var(--ease-out) both;
+}
+@keyframes rise {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: none; }
+}
+
 /* Film grain */
 .grain {
   position: fixed;
@@ -198,6 +221,9 @@ html.has-cursor textarea {
 /* Preloader failsafe: never trap the page if JS fails */
 .preloader {
   animation: preloader-failsafe 0.01s linear 5s forwards;
+}
+html[data-preload="skip"] .preloader {
+  display: none;
 }
 @keyframes preloader-failsafe {
   to { visibility: hidden; opacity: 0; }
