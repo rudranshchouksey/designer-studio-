@@ -69,9 +69,11 @@ function paint(canvas: HTMLCanvasElement, { hue, seed, variant, cell = 14 }: Pro
       const level = m * (0.55 + n * 0.6) - 0.08;
       if (level <= 0.05) continue;
       const q = Math.min(1, Math.round(level * 5) / 5);
-      const mix = a / (m || 1);
-      const hh = h2 + (hue - h2) * mix;
-      ctx.fillStyle = `hsl(${hh} 92% ${20 + q * 48}%)`;
+      const overlap = Math.min(a, b) / (Math.max(a, b) || 1);
+      ctx.fillStyle =
+        variant !== "portrait" && overlap > 0.55 && q > 0.5
+          ? `hsl(18 100% ${62 + q * 28}%)`
+          : `hsl(${a >= b ? hue : h2} 92% ${22 + q * 44}%)`;
       const pad = q > 0.7 ? 1 : 2;
       ctx.fillRect(c * cell + pad, r * cell + pad, cell - pad * 2, cell - pad * 2);
     }

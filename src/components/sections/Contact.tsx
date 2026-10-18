@@ -23,7 +23,7 @@ export function Contact() {
               <CopyEmail />
             </div>
           </div>
-          <div className="relative md:col-span-7 md:col-start-6" data-fade data-delay="0.1">
+          <div className="relative border border-line bg-ink/75 p-6 backdrop-blur-md md:col-span-7 md:col-start-6 md:p-10" data-fade data-delay="0.1">
             <ContactForm />
           </div>
         </div>

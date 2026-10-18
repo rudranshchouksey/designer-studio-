@@ -1,8 +1,9 @@
 "use client";
 
-import { Component, useEffect, useSyncExternalStore, type ReactNode } from "react";
+import { Component, useEffect, useState, useSyncExternalStore, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import { webglAvailable } from "./webgl";
+import { onReady } from "@/lib/ready";
 
 const SceneCanvas = dynamic(() => import("./SceneCanvas"), { ssr: false });
 
@@ -25,15 +26,29 @@ const subscribe = () => () => {};
 
 /** Fixed full-screen WebGL layer. Without WebGL the CSS .backdrop gradient stays as the fallback. */
 export function Scene() {
-  const ok = useSyncExternalStore(subscribe, supported, () => false);
+  const supportedGl = useSyncExternalStore(subscribe, supported, () => false);
+  const [armed, setArmed] = useState(false);
+
+  // Keep the page's first paint light: start WebGL once the preloader is done.
+  useEffect(() => {
+    if (!supportedGl) return;
+    let t: ReturnType<typeof setTimeout>;
+    const off = onReady(() => {
+      t = setTimeout(() => setArmed(true), 60);
+    });
+    return () => {
+      off();
+      clearTimeout(t);
+    };
+  }, [supportedGl]);
 
   useEffect(() => {
-    if (!ok) return;
+    if (!armed) return;
     document.documentElement.dataset.gl = "on";
     return () => document.documentElement.removeAttribute("data-gl");
-  }, [ok]);
+  }, [armed]);
 
-  return ok ? (
+  return armed ? (
     <Boundary>
       <SceneCanvas />
     </Boundary>

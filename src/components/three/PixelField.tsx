@@ -13,8 +13,9 @@ const STAGE_OF_SECTION = [0, 1, 2, 3, 3, 4];
 
 // Desktop layout per formation: horizontal offset as a fraction of half the viewport width.
 const OFFSET_X = [0.46, -0.46, 0, 0.5, 0];
-const SCALE = [1, 1, 1, 0.92, 1];
-const ALPHA = [1, 0.9, 0.9, 0.85, 0.6];
+const SCALE = [1, 0.9, 1, 0.92, 1];
+const MOBILE_Y = [1.15, 1.0, 0.7, 0.5, 1.0];
+const ALPHA = [1, 0.9, 0.9, 0.85, 0.45];
 
 function sample(arr: number[], s: number) {
   const i = Math.min(Math.floor(s), STAGE_COUNT - 2);
@@ -119,7 +120,7 @@ export function PixelField({ count, mobile, reduced }: Props) {
     const s = sample(SCALE, cur) * fit;
     p.scale.setScalar(s);
     p.position.x = mobile ? 0 : sample(OFFSET_X, cur) * halfW;
-    p.position.y = mobile ? 0.4 : 0;
+    p.position.y = mobile ? sample(MOBILE_Y, cur) : 0;
 
     // mouse parallax + idle sway
     const tx = reduced ? 0 : -scrollState.pointer.y * 0.14 + Math.sin(state.clock.elapsedTime * 0.25) * 0.05;

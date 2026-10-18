@@ -8,17 +8,17 @@ export function Services() {
       aria-labelledby="services-title"
       className="relative py-28 md:py-44"
     >
-      <div className="wrap">
+      <div className="wrap md:pl-[calc(var(--gutter)+50%)]">
         <p className="label mb-6" data-fade>
           {services.eyebrow}
         </p>
         <Headline
           id="services-title"
           text={services.headline}
-          className="max-w-4xl text-[clamp(2.8rem,8vw,7.5rem)]"
+          className="max-w-4xl text-[clamp(2.8rem,8vw,7.5rem)] md:text-[clamp(2.8rem,5.4vw,6rem)]"
         />
 
-        <ol className="mt-16 border-t border-line md:mt-24 md:max-w-[62%]" data-stagger>
+        <ol className="mt-16 border-t border-line md:mt-24" data-stagger>
           {services.items.map((s, i) => (
             <li
               key={s.name}

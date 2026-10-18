@@ -100,10 +100,12 @@ body {
   color: var(--color-mute);
 }
 
-.wrap {
-  padding-inline: var(--gutter);
-  max-width: 96rem;
-  margin-inline: auto;
+@layer components {
+  .wrap {
+    padding-inline: var(--gutter);
+    max-width: 96rem;
+    margin-inline: auto;
+  }
 }
 
 /* Line-reveal masks */

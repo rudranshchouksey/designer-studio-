@@ -15,7 +15,7 @@ export function Team() {
           className="max-w-3xl text-[clamp(2.8rem,8vw,7.5rem)]"
         />
 
-        <ul className="mt-16 grid gap-6 sm:grid-cols-2 md:mt-24 md:max-w-[62%]" data-stagger>
+        <ul className="mt-16 grid gap-6 sm:grid-cols-2 md:mt-24 md:max-w-[56%]" data-stagger>
           {team.members.map((m, i) => (
             <li key={m.name} data-stagger-item>
               <article className="border border-line bg-ink/60 backdrop-blur-sm">

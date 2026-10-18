@@ -7,7 +7,7 @@ export function Hero() {
     <section
       id="hero"
       aria-labelledby="hero-title"
-      className="relative flex min-h-[100svh] flex-col justify-end pb-10 pt-32 md:pb-14"
+      className="relative flex min-h-[100svh] flex-col justify-end pb-8 pt-28 md:pb-10"
     >
       <div className="wrap w-full">
         <p className="label mb-6 flex items-center gap-3" data-fade data-delay="0.1">
@@ -22,14 +22,12 @@ export function Hero() {
           as="h1"
           id="hero-title"
           text={hero.headline}
-          className="text-[clamp(3.4rem,13.5vw,12.5rem)]"
+          className="text-[clamp(3.6rem,17vw,5.5rem)] md:text-[clamp(5.5rem,12vw,11.5rem)]"
         />
 
-        <div className="mt-10 grid gap-8 md:mt-14 md:grid-cols-12 md:items-end">
+        <div className="mt-8 grid gap-8 md:mt-10 md:grid-cols-12 md:items-end">
           <p
             className="max-w-xl text-[1.05rem] leading-relaxed text-paper/80 md:col-span-6 md:text-lg"
-            data-fade
-            data-delay="0.2"
           >
             {hero.lede}
           </p>
@@ -42,7 +40,7 @@ export function Hero() {
         </div>
 
         <p
-          className="label mt-12 flex items-center gap-4 md:mt-16"
+          className="label mt-8 flex items-center gap-4 md:mt-10"
           data-fade
           data-delay="0.45"
           aria-hidden="true"
