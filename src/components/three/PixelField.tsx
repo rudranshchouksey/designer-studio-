@@ -10,7 +10,7 @@ import { fragmentShader, vertexShader } from "./shaders";
 // Desktop layout per formation: horizontal offset as a fraction of half the viewport width.
 const OFFSET_X = [0.46, -0.46, 0, 0.5, 0];
 const SCALE = [1, 0.9, 1, 0.92, 1];
-const MOBILE_Y = [1.15, 1.0, 0.7, 0.5, 1.0];
+const MOBILE_Y = [1.4, 1.0, 0.7, 0.5, 1.0];
 const ALPHA = [1, 0.9, 0.9, 0.85, 0.45];
 
 /** Seconds a route-change morph takes. */

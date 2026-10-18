@@ -43,7 +43,7 @@ export function WorkIndex() {
         <ul key={active} className="mt-12 grid gap-6 md:mt-16 md:grid-cols-2 md:gap-8">
           {items.map((study, i) => (
             <li key={study.slug} className="rise" style={{ animationDelay: `${i * 0.07}s` }}>
-              <WorkCard study={study} index={caseStudies.indexOf(study)} ratio="aspect-[4/3]" />
+              <WorkCard study={study} index={caseStudies.indexOf(study)} ratio="aspect-[4/3]" heading="h2" />
             </li>
           ))}
         </ul>

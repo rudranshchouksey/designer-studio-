@@ -3,10 +3,10 @@ import { work, type CaseStudy } from "@/content";
 import { PixelArt } from "./PixelArt";
 import { TiltCard } from "./TiltCard";
 
-type Props = { study: CaseStudy; index: number; ratio?: string };
+type Props = { study: CaseStudy; index: number; ratio?: string; heading?: "h2" | "h3" };
 
 /** Case-study card: generated pixel artwork, discipline label, title, and a "coming soon" / "view" marker. */
-export function WorkCard({ study, index, ratio = "aspect-[4/3]" }: Props) {
+export function WorkCard({ study, index, ratio = "aspect-[4/3]", heading: Heading = "h3" }: Props) {
   const soon = study.status === "coming-soon";
   return (
     <TiltCard>
@@ -22,7 +22,7 @@ export function WorkCard({ study, index, ratio = "aspect-[4/3]" }: Props) {
           </span>
         </div>
         <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 md:p-7">
-          <h3 className="display text-[clamp(1.8rem,3.6vw,3.2rem)]">{study.title}</h3>
+          <Heading className="display text-[clamp(1.8rem,3.6vw,3.2rem)]">{study.title}</Heading>
           <p className="label flex shrink-0 items-center gap-2 text-paper/80">
             {soon ? (
               <>
