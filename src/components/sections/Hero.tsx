@@ -13,7 +13,7 @@ export function Hero() {
         <p className="label rise mb-6 flex items-center gap-3" style={{ animationDelay: "0.1s" }}>
           <span aria-hidden="true" className="relative inline-block h-2.5 w-2.5">
             <span className="absolute left-0 top-0 h-2 w-2 bg-ultra" />
-            <span className="absolute bottom-0 right-0 h-2 w-2 bg-flame mix-blend-screen" />
+            <span className="absolute bottom-0 right-0 h-2 w-2 bg-flame twin-blend" />
           </span>
           {hero.eyebrow}
         </p>

@@ -52,9 +52,9 @@ function targetAt(nodes: StageNode[], scrollY: number, vh: number) {
   return { stage, dim };
 }
 
-type Props = { count: number; mobile: boolean; reduced: boolean; routeKey: string };
+type Props = { count: number; mobile: boolean; reduced: boolean; routeKey: string; light: boolean };
 
-export function PixelField({ count, mobile, reduced, routeKey }: Props) {
+export function PixelField({ count, mobile, reduced, routeKey, light }: Props) {
   const points = useRef<THREE.Points>(null);
   const stage = useRef(0);
   const dim = useRef(0);
@@ -91,6 +91,9 @@ export function PixelField({ count, mobile, reduced, routeKey }: Props) {
       uDrift: { value: reduced ? 0 : 1 },
       uBurst: { value: 0.9 },
       uAlpha: { value: 0.8 },
+      // Deeper, more saturated twins for the light theme (normal blending needs ink-strength colour)
+      uUltra: { value: new THREE.Color(0.357, 0.357, 1.0) },
+      uFlame: { value: new THREE.Color(1.0, 0.416, 0.239) },
     }),
     [mobile, reduced],
   );
@@ -174,7 +177,12 @@ export function PixelField({ count, mobile, reduced, routeKey }: Props) {
     u.uTime.value = state.clock.elapsedTime;
     u.uPx.value = state.gl.getPixelRatio();
     u.uWave.value = wave;
-    u.uAlpha.value = blend(ALPHA) * (1 - (mobile ? 0.72 : 0.55) * dim.current) * (mobile ? 0.62 : 0.85);
+    // setRGB: raw values, no colour-space conversion (the shader outputs them as-is)
+    if (light) u.uUltra.value.setRGB(0.141, 0.141, 0.847);
+    else u.uUltra.value.setRGB(0.357, 0.357, 1.0);
+    if (light) u.uFlame.value.setRGB(0.878, 0.235, 0.031);
+    else u.uFlame.value.setRGB(1.0, 0.416, 0.239);
+    u.uAlpha.value = blend(ALPHA) * (1 - (mobile ? 0.72 : 0.55) * dim.current) * (mobile ? 0.62 : 0.85) * (light ? 1.15 : 1);
 
     const p = points.current;
     if (!p) return;
@@ -202,7 +210,7 @@ export function PixelField({ count, mobile, reduced, routeKey }: Props) {
         transparent
         depthWrite={false}
         depthTest={false}
-        blending={THREE.AdditiveBlending}
+        blending={light ? THREE.NormalBlending : THREE.AdditiveBlending}
       />
     </points>
   );

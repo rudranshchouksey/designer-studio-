@@ -21,7 +21,7 @@ function Set({ hidden }: { hidden?: boolean }) {
           </span>
           <span aria-hidden="true" className="relative inline-block h-5 w-5 shrink-0">
             <span className="absolute left-0 top-0 h-3.5 w-3.5 bg-ultra" />
-            <span className="absolute bottom-0 right-0 h-3.5 w-3.5 bg-flame mix-blend-screen" />
+            <span className="absolute bottom-0 right-0 h-3.5 w-3.5 bg-flame twin-blend" />
           </span>
         </li>
       ))}

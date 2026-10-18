@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useTheme } from "@/lib/theme";
 
 type Props = {
   hue: number;
@@ -20,7 +21,7 @@ function hash(x: number, y: number, s: number) {
 /** Brand-adjacent partner hue: ultramarine-ish hues pair with flame and vice versa. */
 const partner = (hue: number) => (hue > 120 && hue < 330 ? 14 : 232);
 
-function paint(canvas: HTMLCanvasElement, { hue, seed, variant, cell = 14 }: Props) {
+function paint(canvas: HTMLCanvasElement, { hue, seed, variant, cell = 14 }: Props, light: boolean) {
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
   const w = canvas.clientWidth;
@@ -30,7 +31,7 @@ function paint(canvas: HTMLCanvasElement, { hue, seed, variant, cell = 14 }: Pro
   canvas.width = Math.round(w * dpr);
   canvas.height = Math.round(h * dpr);
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  ctx.fillStyle = "#0d0d18";
+  ctx.fillStyle = light ? "#e7e2d8" : "#0d0d18";
   ctx.fillRect(0, 0, w, h);
 
   const cols = Math.ceil(w / cell);
@@ -72,8 +73,12 @@ function paint(canvas: HTMLCanvasElement, { hue, seed, variant, cell = 14 }: Pro
       const overlap = Math.min(a, b) / (Math.max(a, b) || 1);
       ctx.fillStyle =
         variant !== "portrait" && overlap > 0.55 && q > 0.5
-          ? `hsl(18 100% ${62 + q * 28}%)`
-          : `hsl(${a >= b ? hue : h2} 92% ${22 + q * 44}%)`;
+          ? light
+            ? `hsl(18 95% ${64 - q * 22}%)`
+            : `hsl(18 100% ${62 + q * 28}%)`
+          : light
+            ? `hsl(${a >= b ? hue : h2} 85% ${88 - q * 48}%)`
+            : `hsl(${a >= b ? hue : h2} 92% ${22 + q * 44}%)`;
       const pad = q > 0.7 ? 1 : 2;
       ctx.fillRect(c * cell + pad, r * cell + pad, cell - pad * 2, cell - pad * 2);
     }
@@ -83,16 +88,17 @@ function paint(canvas: HTMLCanvasElement, { hue, seed, variant, cell = 14 }: Pro
 export function PixelArt(props: Props) {
   const ref = useRef<HTMLCanvasElement>(null);
   const { hue, seed, variant, cell } = props;
+  const light = useTheme() === "light";
 
   useEffect(() => {
     const canvas = ref.current;
     if (!canvas) return;
-    const draw = () => paint(canvas, { hue, seed, variant, cell });
+    const draw = () => paint(canvas, { hue, seed, variant, cell }, light);
     draw();
     const ro = new ResizeObserver(draw);
     ro.observe(canvas);
     return () => ro.disconnect();
-  }, [hue, seed, variant, cell]);
+  }, [hue, seed, variant, cell, light]);
 
   return <canvas ref={ref} className={`block h-full w-full ${props.className ?? ""}`} aria-hidden="true" />;
 }

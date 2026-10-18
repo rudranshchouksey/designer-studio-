@@ -24,13 +24,13 @@ export function Services() {
               key={s.name}
               data-stagger-item
               data-cursor
-              className="group grid grid-cols-[2.5rem_1fr] gap-x-4 border-b border-line py-7 transition-[transform,background-color] duration-500 ease-[var(--ease-out)] hover:translate-x-3 hover:bg-white/[0.03] md:grid-cols-[3.5rem_1fr] md:py-9"
+              className="group grid grid-cols-[2.5rem_1fr] gap-x-4 border-b border-line py-7 transition-[transform,background-color] duration-500 ease-[var(--ease-out)] hover:translate-x-3 hover:bg-paper/[0.04] md:grid-cols-[3.5rem_1fr] md:py-9"
             >
               <span className="label pt-2 tabular-nums">{String(i + 1).padStart(2, "0")}</span>
               <div>
                 <h3
                   className={`display text-[clamp(1.9rem,4.4vw,3.6rem)] transition-colors duration-300 ${
-                    i % 2 ? "group-hover:text-flame" : "group-hover:text-ultra"
+                    i % 2 ? "group-hover:text-flame" : "group-hover:text-ultra-text"
                   }`}
                 >
                   {s.name}

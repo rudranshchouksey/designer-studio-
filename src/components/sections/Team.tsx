@@ -14,7 +14,7 @@ export function TeamCards({ className = "" }: { className?: string }) {
             </div>
             <div className="p-5 md:p-6">
               <h3 className="display text-3xl">{m.name}</h3>
-              <p className={`label mt-2 ${i ? "text-flame" : "text-ultra"}`}>{m.role}</p>
+              <p className={`label mt-2 ${i ? "text-flame" : "text-ultra-text"}`}>{m.role}</p>
               <p className="mt-4 text-paper/75">{m.bio}</p>
             </div>
           </article>

@@ -57,8 +57,8 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-// Runs before paint: decides whether motion is on and whether the (first-visit-only) preloader should show at all.
-const motionScript = `(function(){var d=document.documentElement;var r=matchMedia('(prefers-reduced-motion: reduce)').matches;var s=false;try{s=sessionStorage.getItem('twinpix-seen')==='1'}catch(e){}d.dataset.motion=r?'off':'on';if(r||s){d.dataset.ready='1';d.dataset.preload='skip'}})();`;
+// Runs before paint: applies the saved theme (default dark — no flash), and decides whether motion is on and whether the (first-visit-only) preloader should show at all.
+const motionScript = `(function(){var d=document.documentElement;var t='dark';try{var v=localStorage.getItem('twinpix-theme');if(v==='light'||v==='dark')t=v}catch(e){}d.dataset.theme=t;if(t==='light'){var m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute('content','#f4f1ea')}var r=matchMedia('(prefers-reduced-motion: reduce)').matches;var s=false;try{s=sessionStorage.getItem('twinpix-seen')==='1'}catch(e){}d.dataset.motion=r?'off':'on';if(r||s){d.dataset.ready='1';d.dataset.preload='skip'}})();`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

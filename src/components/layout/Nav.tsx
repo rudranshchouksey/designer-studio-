@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { nav } from "@/content";
 import { Logo } from "@/components/ui/Logo";
 import { SiteLink } from "@/components/ui/SiteLink";
+import { ThemeToggle } from "./ThemeToggle";
 import { scrollState } from "@/lib/scrollState";
 
 export function Nav() {
@@ -77,6 +78,7 @@ export function Nav() {
               <span className="absolute -bottom-1.5 left-0 h-px w-full origin-left scale-x-0 bg-flame transition-transform duration-300 group-hover:scale-x-100 group-aria-[current=page]:scale-x-100" />
             </SiteLink>
           ))}
+          <ThemeToggle />
           <SiteLink
             href={nav.cta.href}
             className="bg-paper px-5 py-2.5 font-mono text-[0.74rem] uppercase tracking-[0.14em] text-ink transition-colors hover:bg-flame"
@@ -85,10 +87,12 @@ export function Nav() {
           </SiteLink>
         </nav>
 
+        <div className="flex items-center gap-2 md:hidden">
+        <ThemeToggle />
         <button
           ref={toggleRef}
           type="button"
-          className="relative z-[90] flex h-11 w-11 flex-col items-center justify-center gap-[6px] md:hidden"
+          className="relative z-[90] flex h-11 w-11 flex-col items-center justify-center gap-[6px]"
           aria-expanded={open}
           aria-controls="mobile-menu"
           aria-label={open ? "Close menu" : "Open menu"}
@@ -101,6 +105,7 @@ export function Nav() {
             className={`block h-px w-6 bg-paper transition-transform duration-300 ${open ? "-translate-y-[3.5px] -rotate-45" : ""}`}
           />
         </button>
+        </div>
       </div>
 
       <div

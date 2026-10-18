@@ -62,13 +62,13 @@ export const vertexShader = /* glsl */ `
 
 export const fragmentShader = /* glsl */ `
   uniform float uAlpha;
+  uniform vec3 uUltra;
+  uniform vec3 uFlame;
   varying float vColor;
   varying float vShade;
 
   void main() {
-    vec3 ultra = vec3(0.357, 0.357, 1.0);
-    vec3 flame = vec3(1.0, 0.416, 0.239);
     // square pixel: no discard, no rounding
-    gl_FragColor = vec4(mix(ultra, flame, vColor), uAlpha * vShade);
+    gl_FragColor = vec4(mix(uUltra, uFlame, vColor), uAlpha * vShade);
   }
 `;

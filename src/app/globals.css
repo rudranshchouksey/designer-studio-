@@ -1,16 +1,57 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-ink: #0a0a12;
-  --color-ink-2: #11111c;
-  --color-line: rgba(255, 255, 255, 0.12);
-  --color-paper: #f2f0ea;
-  --color-mute: #a2a2b5;
-  --color-ultra: #5b5bff;
-  --color-flame: #ff6a3d;
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-line: var(--line);
+  --color-paper: var(--paper);
+  --color-mute: var(--mute);
+  --color-ultra: var(--ultra);
+  --color-ultra-text: var(--ultra-text);
+  --color-flame: var(--flame);
   --font-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
   --font-serif: var(--font-instrument), ui-serif, Georgia, serif;
   --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, monospace;
+}
+
+/*
+ * Theme tokens. "ink" is always the page background and "paper" the text colour, so the
+ * dark theme is ink-dark / paper-light and the light theme swaps them.
+ * Contrast ratios (WCAG) are checked for every pair in both themes — keep them >= 4.5:1 for text.
+ */
+:root,
+:root[data-theme="dark"] {
+  --ink: #0a0a12;
+  --ink-2: #11111c;
+  --paper: #f2f0ea;
+  --mute: #a2a2b5;
+  --line: rgba(255, 255, 255, 0.12);
+  --ultra: #5b5bff;
+  --ultra-text: #7676ff;
+  --flame: #ff6a3d;
+  --glow-a: rgba(91, 91, 255, 0.22);
+  --glow-b: rgba(255, 106, 61, 0.18);
+  --twin-blend: screen;
+  --grain-opacity: 0.07;
+  --grain-invert: 0;
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  --ink: #f4f1ea;
+  --ink-2: #ebe6dc;
+  --paper: #0a0a12;
+  --mute: #55556a;
+  --line: rgba(10, 10, 18, 0.16);
+  --ultra: #3030e0;
+  --ultra-text: #3030e0;
+  --flame: #c2370a;
+  --glow-a: rgba(48, 48, 224, 0.12);
+  --glow-b: rgba(194, 55, 10, 0.1);
+  --twin-blend: multiply;
+  --grain-opacity: 0.09;
+  --grain-invert: 1;
+  color-scheme: light;
 }
 
 :root {
@@ -20,8 +61,19 @@
 
 html {
   background: var(--color-ink);
-  color-scheme: dark;
   -webkit-text-size-adjust: 100%;
+}
+
+/* Smooth cross-fade when the theme is toggled (class is added briefly by setTheme) */
+html.theme-anim,
+html.theme-anim *,
+html.theme-anim *::before,
+html.theme-anim *::after {
+  transition:
+    background-color 0.35s ease,
+    color 0.35s ease,
+    border-color 0.35s ease,
+    fill 0.35s ease !important;
 }
 
 /* Lenis */
@@ -162,7 +214,8 @@ body {
   inset: -50%;
   z-index: 90;
   pointer-events: none;
-  opacity: 0.07;
+  opacity: var(--grain-opacity);
+  filter: invert(var(--grain-invert));
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1.2 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
   animation: grain 1.2s steps(6) infinite;
 }
@@ -182,14 +235,19 @@ body {
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(60% 50% at 78% 38%, rgba(91, 91, 255, 0.22), transparent 70%),
-    radial-gradient(45% 45% at 64% 62%, rgba(255, 106, 61, 0.18), transparent 70%),
+    radial-gradient(60% 50% at 78% 38%, var(--glow-a), transparent 70%),
+    radial-gradient(45% 45% at 64% 62%, var(--glow-b), transparent 70%),
     var(--color-ink);
 }
 
 /* With WebGL running, the gradient only adds a faint ambient glow */
 html[data-gl="on"] .backdrop {
   opacity: 0.4;
+}
+
+/* Overlapping twin squares: glow (screen) on dark, deepen (multiply) on light */
+.twin-blend {
+  mix-blend-mode: var(--twin-blend);
 }
 
 /* Custom cursor (mouse devices only) */
@@ -209,7 +267,7 @@ html.has-cursor textarea {
   pointer-events: none;
   width: 14px;
   height: 14px;
-  mix-blend-mode: screen;
+  mix-blend-mode: var(--twin-blend);
   will-change: transform;
 }
 .cursor-sq::before {

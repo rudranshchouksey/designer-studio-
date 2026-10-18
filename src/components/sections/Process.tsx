@@ -22,7 +22,7 @@ export function Process() {
               className="grid grid-cols-[3.2rem_1fr] gap-x-4 border-t border-line py-9 md:py-12"
             >
               <span
-                className={`display text-3xl ${i % 2 ? "text-flame" : "text-ultra"}`}
+                className={`display text-3xl ${i % 2 ? "text-flame" : "text-ultra-text"}`}
                 aria-hidden="true"
               >
                 {String(i + 1).padStart(2, "0")}

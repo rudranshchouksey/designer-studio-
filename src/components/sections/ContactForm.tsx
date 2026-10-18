@@ -7,7 +7,7 @@ import { validateContact, type ContactErrors, type ContactInput } from "@/lib/va
 type Status = "idle" | "sending" | "success" | "error";
 
 const fieldBase =
-  "w-full border border-line bg-ink/60 px-4 py-3.5 text-base text-paper placeholder:text-mute/70 transition-colors focus:border-ultra focus:outline-none focus-visible:outline-2 focus-visible:outline-flame";
+  "w-full border border-line bg-ink/60 px-4 py-3.5 text-base text-paper placeholder:text-mute transition-colors focus:border-ultra focus:outline-none focus-visible:outline-2 focus-visible:outline-flame";
 
 /** "compact" = home page (type, name, email, message). "full" = /contact (adds budget + timeline). */
 export function ContactForm({ variant = "compact" }: { variant?: "compact" | "full" }) {
