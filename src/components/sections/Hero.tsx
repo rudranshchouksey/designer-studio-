@@ -1,0 +1,58 @@
+import { hero } from "@/content";
+import { Headline } from "@/components/ui/Headline";
+import { Button } from "@/components/ui/Button";
+
+export function Hero() {
+  return (
+    <section
+      id="hero"
+      aria-labelledby="hero-title"
+      className="relative flex min-h-[100svh] flex-col justify-end pb-10 pt-32 md:pb-14"
+    >
+      <div className="wrap w-full">
+        <p className="label mb-6 flex items-center gap-3" data-fade data-delay="0.1">
+          <span aria-hidden="true" className="relative inline-block h-2.5 w-2.5">
+            <span className="absolute left-0 top-0 h-2 w-2 bg-ultra" />
+            <span className="absolute bottom-0 right-0 h-2 w-2 bg-flame mix-blend-screen" />
+          </span>
+          {hero.eyebrow}
+        </p>
+
+        <Headline
+          as="h1"
+          id="hero-title"
+          text={hero.headline}
+          className="text-[clamp(3.4rem,13.5vw,12.5rem)]"
+        />
+
+        <div className="mt-10 grid gap-8 md:mt-14 md:grid-cols-12 md:items-end">
+          <p
+            className="max-w-xl text-[1.05rem] leading-relaxed text-paper/80 md:col-span-6 md:text-lg"
+            data-fade
+            data-delay="0.2"
+          >
+            {hero.lede}
+          </p>
+          <div className="flex flex-wrap gap-3 md:col-span-6 md:justify-end" data-fade data-delay="0.3">
+            <Button href={hero.primary.href}>{hero.primary.label}</Button>
+            <Button href={hero.secondary.href} variant="ghost">
+              {hero.secondary.label}
+            </Button>
+          </div>
+        </div>
+
+        <p
+          className="label mt-12 flex items-center gap-4 md:mt-16"
+          data-fade
+          data-delay="0.45"
+          aria-hidden="true"
+        >
+          <span className="relative block h-px w-14 overflow-hidden bg-line">
+            <span className="absolute inset-y-0 left-0 w-1/2 animate-[hint_2.2s_var(--ease-out)_infinite] bg-flame" />
+          </span>
+          {hero.scrollHint}
+        </p>
+      </div>
+    </section>
+  );
+}
