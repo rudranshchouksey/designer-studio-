@@ -1,10 +1,14 @@
-import { errors } from "@/content";
+import { errors, site } from "@/content";
 
 export type ContactInput = {
   needs: string[];
   name: string;
   email: string;
   message: string;
+  /** Optional — one of site.budgets */
+  budget?: string;
+  /** Optional — one of site.timelines */
+  timeline?: string;
 };
 
 export type ContactErrors = Partial<Record<keyof ContactInput, string>>;
@@ -22,5 +26,7 @@ export function validateContact(input: ContactInput): ContactErrors {
   const msg = input.message.trim();
   if (!msg) out.message = errors.messageRequired;
   else if (msg.length < 10) out.message = errors.messageShort;
+  if (input.budget && !site.budgets.includes(input.budget)) out.budget = errors.invalidOption;
+  if (input.timeline && !site.timelines.includes(input.timeline)) out.timeline = errors.invalidOption;
   return out;
 }

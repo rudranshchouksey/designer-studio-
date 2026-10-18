@@ -26,6 +26,8 @@ export async function POST(req: Request) {
     name: typeof body.name === "string" ? body.name.slice(0, MAX.name) : "",
     email: typeof body.email === "string" ? body.email.slice(0, MAX.email) : "",
     message: typeof body.message === "string" ? body.message.slice(0, MAX.message) : "",
+    budget: typeof body.budget === "string" ? body.budget.slice(0, 60) : undefined,
+    timeline: typeof body.timeline === "string" ? body.timeline.slice(0, 60) : undefined,
   };
 
   const errors = validateContact(input);
@@ -38,6 +40,8 @@ export async function POST(req: Request) {
     `Name: ${input.name.trim()}`,
     `Email: ${input.email.trim()}`,
     `Needs: ${input.needs.join(", ")}`,
+    ...(input.budget ? [`Budget: ${input.budget}`] : []),
+    ...(input.timeline ? [`Timeline: ${input.timeline}`] : []),
     "",
     input.message.trim(),
   ].join("\n");

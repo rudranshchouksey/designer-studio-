@@ -2,9 +2,37 @@ import { team } from "@/content";
 import { Headline } from "@/components/ui/Headline";
 import { PixelArt } from "@/components/work/PixelArt";
 
+/** The two team cards, reused on the home page and /about. */
+export function TeamCards({ className = "" }: { className?: string }) {
+  return (
+    <ul className={`grid gap-6 sm:grid-cols-2 ${className}`} data-stagger>
+      {team.members.map((m, i) => (
+        <li key={m.name} data-stagger-item>
+          <article className="border border-line bg-ink/60 backdrop-blur-sm">
+            <div className="aspect-[4/5] w-full">
+              <PixelArt hue={m.hue} seed={40 + i * 7} variant="portrait" cell={11} />
+            </div>
+            <div className="p-5 md:p-6">
+              <h3 className="display text-3xl">{m.name}</h3>
+              <p className={`label mt-2 ${i ? "text-flame" : "text-ultra"}`}>{m.role}</p>
+              <p className="mt-4 text-paper/75">{m.bio}</p>
+            </div>
+          </article>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export function Team() {
   return (
-    <section id="team" data-section="Team" data-stage="3" aria-labelledby="team-title" className="relative py-28 md:py-44">
+    <section
+      id="team"
+      data-section="Team"
+      data-stage="3"
+      aria-labelledby="team-title"
+      className="relative py-28 md:py-44"
+    >
       <div className="wrap">
         <p className="label mb-6" data-fade>
           {team.eyebrow}
@@ -14,23 +42,7 @@ export function Team() {
           text={team.headline}
           className="max-w-3xl text-[clamp(2.8rem,8vw,7.5rem)]"
         />
-
-        <ul className="mt-16 grid gap-6 sm:grid-cols-2 md:mt-24 md:max-w-[56%]" data-stagger>
-          {team.members.map((m, i) => (
-            <li key={m.name} data-stagger-item>
-              <article className="border border-line bg-ink/60 backdrop-blur-sm">
-                <div className="aspect-[4/5] w-full">
-                  <PixelArt hue={m.hue} seed={40 + i * 7} variant="portrait" cell={11} />
-                </div>
-                <div className="p-5 md:p-6">
-                  <h3 className="display text-3xl">{m.name}</h3>
-                  <p className={`label mt-2 ${i ? "text-flame" : "text-ultra"}`}>{m.role}</p>
-                  <p className="mt-4 text-paper/75">{m.bio}</p>
-                </div>
-              </article>
-            </li>
-          ))}
-        </ul>
+        <TeamCards className="mt-16 md:mt-24 md:max-w-[56%]" />
       </div>
     </section>
   );

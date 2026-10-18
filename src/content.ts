@@ -345,6 +345,18 @@ export const contact = {
   failure: "Something went wrong sending that. Please try again, or email us directly.",
   copyLabel: "Copy email",
   copiedLabel: "Copied",
+  // Full /contact page
+  pageEyebrow: "Contact",
+  pageHeadline: "Tell us what\n*you're building.*",
+  pageLede: "A few details help us come back with something useful. Everything except the basics is optional.",
+  budgetLabel: "Budget range (optional)",
+  timelineLabel: "Timeline (optional)",
+  selectPlaceholder: "Select…",
+  bookLabel: "Book a call",
+  bookNote: "Prefer to talk it through? Pick a time that suits you.",
+  emailNote: "Or write to us directly:",
+  fullFormLink: "Share the full brief",
+  response: "We reply within two working days.",
 };
 
 /** Validation messages shared by the form and the API route. */
@@ -355,6 +367,7 @@ export const errors = {
   emailInvalid: "That email doesn't look right.",
   messageRequired: "Please add a short message.",
   messageShort: "A little more detail, please (at least 10 characters).",
+  invalidOption: "Please choose one of the listed options.",
 };
 
 export const footer = {

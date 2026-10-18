@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { contact } from "@/content";
+import { contact, site } from "@/content";
 import { validateContact, type ContactErrors, type ContactInput } from "@/lib/validate";
 
 type Status = "idle" | "sending" | "success" | "error";
@@ -9,11 +9,15 @@ type Status = "idle" | "sending" | "success" | "error";
 const fieldBase =
   "w-full border border-line bg-ink/60 px-4 py-3.5 text-base text-paper placeholder:text-mute/70 transition-colors focus:border-ultra focus:outline-none focus-visible:outline-2 focus-visible:outline-flame";
 
-export function ContactForm() {
+/** "compact" = home page (type, name, email, message). "full" = /contact (adds budget + timeline). */
+export function ContactForm({ variant = "compact" }: { variant?: "compact" | "full" }) {
   const [needs, setNeeds] = useState<string[]>([]);
   const [errors, setErrors] = useState<ContactErrors>({});
   const [status, setStatus] = useState<Status>("idle");
   const form = useRef<HTMLFormElement>(null);
+  const full = variant === "full";
+  // Unique ids so two forms on one page (never the case today) can't collide.
+  const p = full ? "full-" : "";
 
   const toggle = (n: string) => {
     setNeeds((cur) => (cur.includes(n) ? cur.filter((x) => x !== n) : [...cur, n]));
@@ -30,6 +34,8 @@ export function ContactForm() {
       name: String(fd.get("name") ?? ""),
       email: String(fd.get("email") ?? ""),
       message: String(fd.get("message") ?? ""),
+      budget: full ? String(fd.get("budget") ?? "") || undefined : undefined,
+      timeline: full ? String(fd.get("timeline") ?? "") || undefined : undefined,
     };
     const found = validateContact(input);
     setErrors(found);
@@ -62,19 +68,48 @@ export function ContactForm() {
 
   const err = (id: string, msg?: string) =>
     msg ? (
-      <p id={`${id}-error`} className="mt-2 font-mono text-[0.78rem] text-flame">
+      <p id={`${p}${id}-error`} className="mt-2 font-mono text-[0.78rem] text-flame">
         {msg}
       </p>
     ) : null;
 
   const ariaFor = (k: keyof ContactInput) => ({
     "aria-invalid": errors[k] ? true : undefined,
-    "aria-describedby": errors[k] ? `${k}-error` : undefined,
+    "aria-describedby": errors[k] ? `${p}${k}-error` : undefined,
   });
+
+  const select = (k: "budget" | "timeline", label: string, options: string[]) => (
+    <div>
+      <label htmlFor={`${p}${k}`} className="label mb-2 block">
+        {label}
+      </label>
+      <div className="relative">
+        <select
+          id={`${p}${k}`}
+          name={k}
+          defaultValue=""
+          onChange={clear(k)}
+          className={`${fieldBase} appearance-none pr-10`}
+          {...ariaFor(k)}
+        >
+          <option value="">{contact.selectPlaceholder}</option>
+          {options.map((o) => (
+            <option key={o} value={o}>
+              {o}
+            </option>
+          ))}
+        </select>
+        <span aria-hidden="true" className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-mute">
+          ↓
+        </span>
+      </div>
+      {err(k, errors[k])}
+    </div>
+  );
 
   return (
     <form ref={form} onSubmit={onSubmit} noValidate className="space-y-8" aria-label="Project enquiry">
-      <fieldset aria-describedby={errors.needs ? "needs-error" : undefined}>
+      <fieldset aria-describedby={errors.needs ? `${p}needs-error` : undefined}>
         <legend className="label mb-4">{contact.needsLabel}</legend>
         <div className="flex flex-wrap gap-2.5">
           {contact.needs.map((n) => {
@@ -102,11 +137,11 @@ export function ContactForm() {
 
       <div className="grid gap-8 sm:grid-cols-2">
         <div>
-          <label htmlFor="name" className="label mb-2 block">
+          <label htmlFor={`${p}name`} className="label mb-2 block">
             {contact.fields.name.label}
           </label>
           <input
-            id="name"
+            id={`${p}name`}
             name="name"
             autoComplete="name"
             placeholder={contact.fields.name.placeholder}
@@ -117,11 +152,11 @@ export function ContactForm() {
           {err("name", errors.name)}
         </div>
         <div>
-          <label htmlFor="email" className="label mb-2 block">
+          <label htmlFor={`${p}email`} className="label mb-2 block">
             {contact.fields.email.label}
           </label>
           <input
-            id="email"
+            id={`${p}email`}
             name="email"
             type="email"
             autoComplete="email"
@@ -134,14 +169,21 @@ export function ContactForm() {
         </div>
       </div>
 
+      {full && (
+        <div className="grid gap-8 sm:grid-cols-2">
+          {select("budget", contact.budgetLabel, site.budgets)}
+          {select("timeline", contact.timelineLabel, site.timelines)}
+        </div>
+      )}
+
       <div>
-        <label htmlFor="message" className="label mb-2 block">
+        <label htmlFor={`${p}message`} className="label mb-2 block">
           {contact.fields.message.label}
         </label>
         <textarea
-          id="message"
+          id={`${p}message`}
           name="message"
-          rows={5}
+          rows={full ? 7 : 5}
           placeholder={contact.fields.message.placeholder}
           onChange={clear("message")}
           className={`${fieldBase} resize-y`}

@@ -1,11 +1,19 @@
 import { contact } from "@/content";
 import { Headline } from "@/components/ui/Headline";
+import { Button } from "@/components/ui/Button";
 import { CopyEmail } from "@/components/ui/CopyEmail";
 import { ContactForm } from "./ContactForm";
 
+/** Home-page contact section (compact form). The full brief lives at /contact. */
 export function Contact() {
   return (
-    <section id="contact" data-section="Contact" data-stage="4" aria-labelledby="contact-title" className="relative py-28 md:py-44">
+    <section
+      id="contact"
+      data-section="Contact"
+      data-stage="4"
+      aria-labelledby="contact-title"
+      className="relative py-28 md:py-44"
+    >
       <div className="wrap">
         <p className="label mb-6" data-fade>
           {contact.eyebrow}
@@ -22,8 +30,17 @@ export function Contact() {
             <div className="mt-8">
               <CopyEmail />
             </div>
+            <div className="mt-8">
+              <Button href="/contact" variant="ghost">
+                {contact.fullFormLink}
+              </Button>
+            </div>
           </div>
-          <div className="relative border border-line bg-ink/75 p-6 backdrop-blur-md md:col-span-7 md:col-start-6 md:p-10" data-fade data-delay="0.1">
+          <div
+            className="relative border border-line bg-ink/75 p-6 backdrop-blur-md md:col-span-7 md:col-start-6 md:p-10"
+            data-fade
+            data-delay="0.1"
+          >
             <ContactForm />
           </div>
         </div>

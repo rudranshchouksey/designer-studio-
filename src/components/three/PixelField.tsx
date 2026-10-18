@@ -174,7 +174,7 @@ export function PixelField({ count, mobile, reduced, routeKey }: Props) {
     u.uTime.value = state.clock.elapsedTime;
     u.uPx.value = state.gl.getPixelRatio();
     u.uWave.value = wave;
-    u.uAlpha.value = blend(ALPHA) * (1 - 0.55 * dim.current) * (mobile ? 0.62 : 0.85);
+    u.uAlpha.value = blend(ALPHA) * (1 - (mobile ? 0.72 : 0.55) * dim.current) * (mobile ? 0.62 : 0.85);
 
     const p = points.current;
     if (!p) return;
