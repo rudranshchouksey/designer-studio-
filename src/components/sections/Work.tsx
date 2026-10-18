@@ -1,7 +1,7 @@
-import { work } from "@/content";
+import { caseStudies, work } from "@/content";
 import { Headline } from "@/components/ui/Headline";
-import { PixelArt } from "@/components/work/PixelArt";
-import { TiltCard } from "@/components/work/TiltCard";
+import { Button } from "@/components/ui/Button";
+import { WorkCard } from "@/components/work/WorkCard";
 
 // Asymmetric 2x2: column spans, vertical offsets and aspect ratios per card.
 const LAYOUT = [
@@ -13,7 +13,13 @@ const LAYOUT = [
 
 export function Work() {
   return (
-    <section id="work" aria-labelledby="work-title" className="relative py-28 md:py-44">
+    <section
+      id="work"
+      data-section="Work"
+      data-stage="2"
+      aria-labelledby="work-title"
+      className="relative py-28 md:py-44"
+    >
       <div className="wrap">
         <p className="label mb-6" data-fade>
           {work.eyebrow}
@@ -25,32 +31,18 @@ export function Work() {
         />
 
         <ul className="mt-16 grid gap-6 md:mt-24 md:grid-cols-12 md:gap-8" data-stagger>
-          {work.items.map((item, i) => (
-            <li key={item.title} className={LAYOUT[i].col} data-stagger-item>
-              <TiltCard>
-                <article
-                  data-cursor
-                  className="group relative overflow-hidden border border-line bg-ink-2"
-                >
-                  <div className={`relative w-full ${LAYOUT[i].ratio}`}>
-                    <PixelArt hue={item.hue} seed={i + 3} cell={i % 2 ? 12 : 16} />
-                    <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-transparent to-transparent" />
-                    <span className="label absolute left-4 top-4 bg-ink/70 px-2 py-1 text-paper">
-                      {String(i + 1).padStart(2, "0")} · {item.kind}
-                    </span>
-                  </div>
-                  <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 md:p-7">
-                    <h3 className="display text-[clamp(1.8rem,3.6vw,3.2rem)]">{item.title}</h3>
-                    <p className="label flex shrink-0 items-center gap-2 text-paper/80">
-                      <span aria-hidden="true" className="h-2 w-2 animate-pulse bg-flame" />
-                      {work.note}
-                    </p>
-                  </div>
-                </article>
-              </TiltCard>
+          {caseStudies.slice(0, 4).map((study, i) => (
+            <li key={study.slug} className={LAYOUT[i].col} data-stagger-item>
+              <WorkCard study={study} index={i} ratio={LAYOUT[i].ratio} />
             </li>
           ))}
         </ul>
+
+        <div className="mt-16 md:mt-24" data-fade>
+          <Button href="/work" variant="ghost">
+            {work.viewAll}
+          </Button>
+        </div>
       </div>
     </section>
   );

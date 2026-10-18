@@ -1,15 +1,24 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { sections } from "@/content";
+import { usePathname } from "next/navigation";
 
-/** Slim progress rail on the right edge + name of the current section. */
+type Item = { top: number; label: string };
+
+/** Slim progress rail on the right edge + name of the current section ([data-section] on the page). */
 export function ScrollRail() {
   const fill = useRef<HTMLSpanElement>(null);
-  const [active, setActive] = useState(0);
+  const items = useRef<Item[]>([]);
+  const pathname = usePathname();
+  const [active, setActive] = useState({ i: 0, n: 0, label: "" });
 
   useEffect(() => {
     let raf = 0;
+    const measure = () => {
+      items.current = Array.from(document.querySelectorAll<HTMLElement>("[data-section]"))
+        .map((el) => ({ top: el.getBoundingClientRect().top + window.scrollY, label: el.dataset.section ?? "" }))
+        .sort((a, b) => a.top - b.top);
+    };
     const update = () => {
       raf = 0;
       const max = document.documentElement.scrollHeight - window.innerHeight;
@@ -17,36 +26,43 @@ export function ScrollRail() {
       if (fill.current) fill.current.style.transform = `scaleY(${p})`;
       const probe = window.scrollY + window.innerHeight * 0.4;
       let idx = 0;
-      sections.forEach((s, i) => {
-        const el = document.getElementById(s.id);
-        if (el && el.getBoundingClientRect().top + window.scrollY <= probe) idx = i;
+      items.current.forEach((s, i) => {
+        if (s.top <= probe) idx = i;
       });
-      setActive(idx);
+      const n = items.current.length;
+      const label = items.current[idx]?.label ?? "";
+      setActive((a) => (a.i === idx && a.n === n && a.label === label ? a : { i: idx, n, label }));
     };
     const onScroll = () => {
       if (!raf) raf = requestAnimationFrame(update);
     };
-    update();
+    const remeasure = () => {
+      measure();
+      onScroll();
+    };
+    remeasure();
+    const t = setTimeout(remeasure, 300);
+    const ro = new ResizeObserver(remeasure);
+    ro.observe(document.body);
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
     return () => {
+      clearTimeout(t);
+      ro.disconnect();
       window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
       if (raf) cancelAnimationFrame(raf);
     };
-  }, []);
+  }, [pathname]);
 
   return (
     <div
       aria-hidden="true"
       className="pointer-events-none fixed right-0 top-1/2 z-[70] flex -translate-y-1/2 items-center gap-3 pr-3 md:pr-6"
     >
-      <span
-        className="label hidden text-paper/70 md:block"
-        style={{ writingMode: "vertical-rl" }}
-      >
-        {String(active + 1).padStart(2, "0")} — {sections[active].label}
-      </span>
+      {active.label && (
+        <span className="label hidden text-paper/70 md:block" style={{ writingMode: "vertical-rl" }}>
+          {String(active.i + 1).padStart(2, "0")} — {active.label}
+        </span>
+      )}
       <span className="relative block h-[34vh] w-px bg-line">
         <span
           ref={fill}

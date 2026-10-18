@@ -140,6 +140,14 @@ body {
   to { transform: none; }
 }
 
+.page-enter {
+  animation: page-enter 0.55s var(--ease-out) both;
+}
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+
 .rise {
   animation: rise 0.9s var(--ease-out) both;
 }

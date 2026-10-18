@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/Button";
 export function Hero() {
   return (
     <section
-      id="hero"
+      id="hero" data-section="Intro" data-stage="0"
       aria-labelledby="hero-title"
       className="relative flex min-h-[100svh] flex-col justify-end pb-8 pt-28 md:pb-10"
     >

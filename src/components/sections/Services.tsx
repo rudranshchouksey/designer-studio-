@@ -4,7 +4,7 @@ import { Headline } from "@/components/ui/Headline";
 export function Services() {
   return (
     <section
-      id="services"
+      id="services" data-section="Services" data-stage="1"
       aria-labelledby="services-title"
       className="relative py-28 md:py-44"
     >

@@ -4,7 +4,7 @@ import { PixelArt } from "@/components/work/PixelArt";
 
 export function Team() {
   return (
-    <section id="team" aria-labelledby="team-title" className="relative py-28 md:py-44">
+    <section id="team" data-section="Team" data-stage="3" aria-labelledby="team-title" className="relative py-28 md:py-44">
       <div className="wrap">
         <p className="label mb-6" data-fade>
           {team.eyebrow}

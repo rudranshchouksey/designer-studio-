@@ -3,6 +3,10 @@ import { Bricolage_Grotesque, Instrument_Serif, JetBrains_Mono } from "next/font
 import { site } from "@/content";
 import { Grain } from "@/components/layout/Grain";
 import { Enhancements } from "@/components/layout/Enhancements";
+import { Nav } from "@/components/layout/Nav";
+import { ScrollRail } from "@/components/layout/ScrollRail";
+import { Footer } from "@/components/layout/Footer";
+import { Scene } from "@/components/three/Scene";
 import { Preloader } from "@/components/layout/Preloader";
 import "./globals.css";
 
@@ -73,7 +77,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Preloader />
         <Enhancements />
         <Grain />
-        {children}
+        <div className="backdrop" aria-hidden="true" />
+        <Scene />
+        <Nav />
+        <ScrollRail />
+        <main id="main" className="relative z-10">
+          {children}
+        </main>
+        <Footer />
       </body>
     </html>
   );

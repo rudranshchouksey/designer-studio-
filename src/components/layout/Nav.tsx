@@ -1,12 +1,15 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { nav } from "@/content";
 import { Logo } from "@/components/ui/Logo";
-import { scrollState, scrollToId, scrollToTop } from "@/lib/scrollState";
+import { SiteLink } from "@/components/ui/SiteLink";
+import { scrollState } from "@/lib/scrollState";
 
 export function Nav() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
   const toggleRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -15,7 +18,13 @@ export function Nav() {
     toggleRef.current?.focus();
   }, []);
 
-  // Lock scroll + trap Escape while the mobile menu is open.
+  // Close the mobile menu after navigating.
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setOpen(false);
+  }, [pathname]);
+
+  // Lock scroll + trap focus/Escape while the mobile menu is open.
   useEffect(() => {
     if (!open) return;
     scrollState.lenis?.stop();
@@ -47,47 +56,33 @@ export function Nav() {
     };
   }, [open, close]);
 
-  const go = (href: string) => (e: React.MouseEvent) => {
-    e.preventDefault();
-    setOpen(false);
-    // let the scroll lock release before scrolling
-    requestAnimationFrame(() => scrollToId(href.slice(1)));
-  };
+  const isCurrent = (href: string) => !href.includes("#") && (pathname === href || pathname.startsWith(href + "/"));
 
   return (
     <header className="fixed inset-x-0 top-0 z-[80]">
       <div className="wrap flex h-20 items-center justify-between">
-        <a
-          href="#hero"
-          aria-label="Twinpix Studio — back to top"
-          onClick={(e) => {
-            e.preventDefault();
-            setOpen(false);
-            scrollToTop();
-          }}
-        >
+        <SiteLink href="/" aria-label="Twinpix Studio — home" onClick={() => setOpen(false)}>
           <Logo />
-        </a>
+        </SiteLink>
 
         <nav aria-label="Primary" className="hidden items-center gap-9 md:flex">
           {nav.links.map((l) => (
-            <a
+            <SiteLink
               key={l.href}
               href={l.href}
-              onClick={go(l.href)}
-              className="group relative font-mono text-[0.74rem] uppercase tracking-[0.14em] text-paper/80 transition-colors hover:text-paper"
+              aria-current={isCurrent(l.href) ? "page" : undefined}
+              className="group relative font-mono text-[0.74rem] uppercase tracking-[0.14em] text-paper/80 transition-colors hover:text-paper aria-[current=page]:text-paper"
             >
               {l.label}
-              <span className="absolute -bottom-1.5 left-0 h-px w-full origin-left scale-x-0 bg-flame transition-transform duration-300 group-hover:scale-x-100" />
-            </a>
+              <span className="absolute -bottom-1.5 left-0 h-px w-full origin-left scale-x-0 bg-flame transition-transform duration-300 group-hover:scale-x-100 group-aria-[current=page]:scale-x-100" />
+            </SiteLink>
           ))}
-          <a
+          <SiteLink
             href={nav.cta.href}
-            onClick={go(nav.cta.href)}
             className="bg-paper px-5 py-2.5 font-mono text-[0.74rem] uppercase tracking-[0.14em] text-ink transition-colors hover:bg-flame"
           >
             {nav.cta.label}
-          </a>
+          </SiteLink>
         </nav>
 
         <button
@@ -117,14 +112,14 @@ export function Nav() {
         <nav aria-label="Mobile">
           <ul className="space-y-1">
             {[...nav.links, nav.cta].map((l) => (
-              <li key={l.href}>
-                <a
+              <li key={l.href + l.label}>
+                <SiteLink
                   href={l.href}
-                  onClick={go(l.href)}
+                  onClick={() => setOpen(false)}
                   className="display block py-2 text-[clamp(2.4rem,12vw,4rem)] transition-colors hover:text-flame"
                 >
                   {l.label}
-                </a>
+                </SiteLink>
               </li>
             ))}
           </ul>

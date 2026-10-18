@@ -5,7 +5,7 @@ import { ContactForm } from "./ContactForm";
 
 export function Contact() {
   return (
-    <section id="contact" aria-labelledby="contact-title" className="relative py-28 md:py-44">
+    <section id="contact" data-section="Contact" data-stage="4" aria-labelledby="contact-title" className="relative py-28 md:py-44">
       <div className="wrap">
         <p className="label mb-6" data-fade>
           {contact.eyebrow}

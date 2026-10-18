@@ -4,12 +4,8 @@ import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
 import { scrollState } from "@/lib/scrollState";
-import { sections } from "@/content";
 import { buildColors, buildFormations, buildRandoms, STAGE_COUNT } from "./formations";
 import { fragmentShader, vertexShader } from "./shaders";
-
-/** Which formation each page section shows (process + team share the helix). */
-const STAGE_OF_SECTION = [0, 1, 2, 3, 3, 4];
 
 // Desktop layout per formation: horizontal offset as a fraction of half the viewport width.
 const OFFSET_X = [0.46, -0.46, 0, 0.5, 0];
@@ -17,18 +13,56 @@ const SCALE = [1, 0.9, 1, 0.92, 1];
 const MOBILE_Y = [1.15, 1.0, 0.7, 0.5, 1.0];
 const ALPHA = [1, 0.9, 0.9, 0.85, 0.45];
 
+/** Seconds a route-change morph takes. */
+const ROUTE_MORPH = 1.3;
+
 function sample(arr: number[], s: number) {
   const i = Math.min(Math.floor(s), STAGE_COUNT - 2);
   return arr[i] + (arr[i + 1] - arr[i]) * (s - i);
 }
 
-type Props = { count: number; mobile: boolean; reduced: boolean };
+/** A page section that declares which formation it wants: <section data-stage="2" data-scene="dim">. */
+type StageNode = { top: number; stage: number; dim: number };
 
-export function PixelField({ count, mobile, reduced }: Props) {
+function measureNodes(): StageNode[] {
+  return Array.from(document.querySelectorAll<HTMLElement>("[data-stage]"))
+    .map((el) => ({
+      top: el.getBoundingClientRect().top + window.scrollY,
+      stage: Number(el.dataset.stage) || 0,
+      dim: el.dataset.scene === "dim" ? 1 : 0,
+    }))
+    .sort((a, b) => a.top - b.top);
+}
+
+/** Scroll position -> continuous formation index (0..4) and dim amount. Holds mid-section, blends across boundaries. */
+function targetAt(nodes: StageNode[], scrollY: number, vh: number) {
+  if (!nodes.length) return { stage: 0, dim: 0 };
+  const y = scrollY + vh / 2;
+  const w = vh * 0.4;
+  let stage = nodes[0].stage;
+  let dim = nodes[0].dim;
+  for (let i = 1; i < nodes.length; i++) {
+    const ds = nodes[i].stage - nodes[i - 1].stage;
+    const dd = nodes[i].dim - nodes[i - 1].dim;
+    if (!ds && !dd) continue;
+    const k = Math.min(1, Math.max(0, (y - (nodes[i].top - w)) / (2 * w)));
+    stage += ds * k;
+    dim += dd * k;
+  }
+  return { stage, dim };
+}
+
+type Props = { count: number; mobile: boolean; reduced: boolean; routeKey: string };
+
+export function PixelField({ count, mobile, reduced, routeKey }: Props) {
   const points = useRef<THREE.Points>(null);
   const stage = useRef(0);
-  const tops = useRef<number[]>([]);
+  const dim = useRef(0);
+  const nodes = useRef<StageNode[]>([]);
   const rot = useRef({ x: 0, y: 0 });
+  const lastKey = useRef(routeKey);
+  /** Active route-change morph: jumps straight between two formations instead of scrubbing through the ones in between. */
+  const morph = useRef<{ from: number; to: number; p: number } | null>(null);
 
   const geometry = useMemo(() => {
     const f = buildFormations(count);
@@ -63,64 +97,92 @@ export function PixelField({ count, mobile, reduced }: Props) {
 
   useEffect(() => () => geometry.dispose(), [geometry]);
 
-  // Cache where each section starts so the frame loop never touches layout.
+  // Re-measure the page's [data-stage] sections after route changes, resizes and late layout shifts.
   useEffect(() => {
     const measure = () => {
-      tops.current = sections.map((s) => {
-        const el = document.getElementById(s.id);
-        return el ? el.getBoundingClientRect().top + window.scrollY : 0;
-      });
+      nodes.current = measureNodes();
     };
     measure();
+    const t1 = setTimeout(measure, 200);
+    const t2 = setTimeout(measure, 900);
     const ro = new ResizeObserver(measure);
     ro.observe(document.body);
     window.addEventListener("load", measure);
     return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
       ro.disconnect();
       window.removeEventListener("load", measure);
     };
-  }, []);
+  }, [routeKey]);
 
   useFrame((state, delta) => {
     const dt = Math.min(delta, 0.05);
     const vh = window.innerHeight;
-    const y = window.scrollY + vh / 2;
-    const w = vh * 0.4;
 
-    // Scroll position -> continuous formation index (0..4). Holds mid-section, blends across boundaries.
-    let target = STAGE_OF_SECTION[0];
-    const t = tops.current;
-    for (let i = 1; i < STAGE_OF_SECTION.length; i++) {
-      const d = STAGE_OF_SECTION[i] - STAGE_OF_SECTION[i - 1];
-      if (!d || t[i] === undefined) continue;
-      const k = Math.min(1, Math.max(0, (y - (t[i] - w)) / (2 * w)));
-      target += d * k;
+    // New route: start a morph from wherever we are to the new page's opening formation.
+    if (lastKey.current !== routeKey) {
+      lastKey.current = routeKey;
+      nodes.current = measureNodes();
+      const next = targetAt(nodes.current, window.scrollY, vh).stage;
+      const from = Math.round(stage.current);
+      const to = Math.round(next);
+      if (!reduced && from !== to) morph.current = { from, to, p: 0 };
+      else stage.current = next;
     }
 
-    stage.current = reduced
-      ? Math.round(target)
-      : THREE.MathUtils.damp(stage.current, target, 3.2, dt);
+    const target = targetAt(nodes.current, window.scrollY, vh);
+    dim.current = reduced ? target.dim : THREE.MathUtils.damp(dim.current, target.dim, 3, dt);
 
-    const cur = Math.min(Math.max(stage.current, 0), STAGE_COUNT - 1);
-    const from = Math.min(Math.floor(cur), STAGE_COUNT - 2);
     const u = matRef.current?.uniforms;
     if (!u) return;
+
+    // Resolve the formation pair + blend for this frame.
+    let from: number;
+    let to: number;
+    let t: number;
+    let blend: (arr: number[]) => number;
+    let wave: number;
+    const m = morph.current;
+    if (m) {
+      m.p = Math.min(1, m.p + dt / ROUTE_MORPH);
+      const e = m.p * m.p * (3 - 2 * m.p);
+      from = m.from;
+      to = m.to;
+      t = m.p;
+      blend = (arr) => arr[m.from] + (arr[m.to] - arr[m.from]) * e;
+      wave = Math.max(0, 1 - Math.abs(m.from + (m.to - m.from) * e - 1));
+      if (m.p >= 1) {
+        stage.current = m.to;
+        morph.current = null;
+      }
+    } else {
+      stage.current = reduced
+        ? Math.round(target.stage)
+        : THREE.MathUtils.damp(stage.current, target.stage, 3.2, dt);
+      const cur = Math.min(Math.max(stage.current, 0), STAGE_COUNT - 1);
+      from = Math.min(Math.floor(cur), STAGE_COUNT - 2);
+      to = from + 1;
+      t = cur - from;
+      blend = (arr) => sample(arr, cur);
+      wave = Math.max(0, 1 - Math.abs(cur - 1));
+    }
+
     u.uFrom.value = from;
-    u.uTo.value = from + 1;
-    u.uT.value = cur - from;
+    u.uTo.value = to;
+    u.uT.value = t;
     u.uTime.value = state.clock.elapsedTime;
     u.uPx.value = state.gl.getPixelRatio();
-    u.uWave.value = Math.max(0, 1 - Math.abs(cur - 1));
-    u.uAlpha.value = sample(ALPHA, cur) * (mobile ? 0.62 : 0.85);
+    u.uWave.value = wave;
+    u.uAlpha.value = blend(ALPHA) * (1 - 0.55 * dim.current) * (mobile ? 0.62 : 0.85);
 
     const p = points.current;
     if (!p) return;
     const halfW = state.viewport.width / 2;
     const fit = mobile ? Math.min(1, halfW / 2.1) : Math.min(1, halfW / 4.2);
-    const s = sample(SCALE, cur) * fit;
-    p.scale.setScalar(s);
-    p.position.x = mobile ? 0 : sample(OFFSET_X, cur) * halfW;
-    p.position.y = mobile ? sample(MOBILE_Y, cur) : 0;
+    p.scale.setScalar(blend(SCALE) * fit);
+    p.position.x = mobile ? 0 : blend(OFFSET_X) * halfW;
+    p.position.y = mobile ? blend(MOBILE_Y) : 0;
 
     // mouse parallax + idle sway
     const tx = reduced ? 0 : -scrollState.pointer.y * 0.14 + Math.sin(state.clock.elapsedTime * 0.25) * 0.05;

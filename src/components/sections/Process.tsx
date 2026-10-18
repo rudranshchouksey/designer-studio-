@@ -1,9 +1,9 @@
-import { process as content } from "@/content";
+import { processContent as content } from "@/content";
 import { Headline } from "@/components/ui/Headline";
 
 export function Process() {
   return (
-    <section id="process" aria-labelledby="process-title" className="relative py-28 md:py-44">
+    <section id="process" data-section="Process" data-stage="3" aria-labelledby="process-title" className="relative py-28 md:py-44">
       <div className="wrap">
         <p className="label mb-6" data-fade>
           {content.eyebrow}
