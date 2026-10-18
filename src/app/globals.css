@@ -149,6 +149,11 @@ body {
     var(--color-ink);
 }
 
+/* With WebGL running, the gradient only adds a faint ambient glow */
+html[data-gl="on"] .backdrop {
+  opacity: 0.4;
+}
+
 /* Custom cursor (mouse devices only) */
 html.has-cursor,
 html.has-cursor a,

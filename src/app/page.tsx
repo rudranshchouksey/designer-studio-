@@ -1,12 +1,14 @@
 import { Nav } from "@/components/layout/Nav";
 import { ScrollRail } from "@/components/layout/ScrollRail";
 import { Footer } from "@/components/layout/Footer";
+import { Scene } from "@/components/three/Scene";
 import { sections } from "@/content";
 
 export default function Home() {
   return (
     <>
       <div className="backdrop" aria-hidden="true" />
+      <Scene />
       <Nav />
       <ScrollRail />
       <main id="main" className="relative z-10">
