@@ -1,5 +1,6 @@
 import { team } from "@/content";
 import { Headline } from "@/components/ui/Headline";
+import Image from "next/image";
 import { PixelArt } from "@/components/work/PixelArt";
 
 /** The two team cards, reused on the home page and /about. */
@@ -7,10 +8,20 @@ export function TeamCards({ className = "" }: { className?: string }) {
   return (
     <ul className={`grid gap-6 sm:grid-cols-2 ${className}`} data-stagger>
       {team.members.map((m, i) => (
-        <li key={m.name} data-stagger-item>
-          <article className="border border-line bg-ink/60 backdrop-blur-sm">
-            <div className="aspect-[4/5] w-full">
-              <PixelArt hue={m.hue} seed={40 + i * 7} variant="portrait" cell={11} />
+        <li key={m.name} data-stagger-item className="h-full">
+          <article className="h-full border border-line bg-ink/60 backdrop-blur-sm">
+            <div className="relative aspect-[4/5] w-full overflow-hidden">
+              {m.photo ? (
+                <Image
+                  src={m.photo.src}
+                  alt={m.photo.alt}
+                  fill
+                  sizes="(min-width: 1024px) 28vw, (min-width: 640px) 45vw, 100vw"
+                  className="object-cover"
+                />
+              ) : (
+                <PixelArt hue={m.hue} seed={40 + i * 7} variant="portrait" cell={11} />
+              )}
             </div>
             <div className="p-5 md:p-6">
               <h3 className="display text-3xl">{m.name}</h3>

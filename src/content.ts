@@ -316,6 +316,8 @@ export const team = {
       role: "Founder & Design Lead",
       bio: "Sets the creative direction and holds every frame to it.",
       hue: 232,
+      // Portraits live in public/team/. Remove `photo` to fall back to the generated pixel portrait.
+      photo: { src: "/team/divyani.jpg", alt: "Portrait of Divyani Jaiswal" },
     },
     {
       name: "Rudransh",
@@ -324,6 +326,7 @@ export const team = {
       // TODO: replace with Rudransh's real bio (placeholder).
       bio: "Bio coming soon.",
       hue: 14,
+      photo: { src: "/team/rudransh.jpg", alt: "Portrait of Rudransh" },
     },
   ],
 };
